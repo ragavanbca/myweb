@@ -4,6 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <!-- CSS only -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
@@ -36,13 +37,16 @@
 
         <!-- Js File Link -->
         <script type="text/javascript" src="main.js"></script>
+        
+        <!-- css File Link -->
+        <link rel="stylesheet" href="main.css" />
 
         <title>Ragavan</title>
     </head>
 
     <body>
         <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light lineupAnimation">
             <!-- Container wrapper -->
             <div class="container-fluid">
                 <!-- Toggle button -->
@@ -56,7 +60,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Navbar brand -->
                     <a class="navbar-brand mt-2 mt-lg-0" href="#">
-                        <img src="img/photo_2022-07-09_22-58-59.jpg" height="45" alt="logo" loading="lazy" />
+                        <img src="img/photo_2022-07-09_22-58-59.jpg" height="45" alt="logo" loading="lazy" title="Ragavan"/>
                     </a>
                     <!-- Left links -->
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -78,41 +82,33 @@
                 <div class="d-flex align-items-center">
                     <!-- dark and light mode icon -->
                     <div class="form-check form-switch" id="darkMode">
-                        <input class="form-check-input" type="checkbox" id="darkMode" value="1">
+                        <input class="form-check-input" type="checkbox" id="darkMode" value="1" onchange="switchcolor()">
                         <label class="form-check-label" for="darkMode">Default switch checkbox
                             input</label>
                     </div>
+
                 </div>
                 <!-- Right elements -->
             </div>
             <!-- Container wrapper -->
         </nav>
         <!-- Navbar -->
-        <div class="container-md">
-            <!-- Content here -->
-            <div id="Dashboard">
-                <div class="row text-center">
-                    <center>
-                        <img src="img/classic-350-grey-front-2-3-angle-2-international.jpg" style="max-width: 37%;" />
-                    </center>
-                </div>
+
+        <div class="row homePage text-center lineupAnimation" >
+            <div class="col-lg-6 col-md-6 col-sm-12 introText">
+                <h1>Ragavan</h1>
             </div>
 
-            <div class="row text-center" id="team" style="display:none;">
+            <div class="col-lg-6 col-md-6 col-sm-12">
                 <center>
-                    <h1>Team</h1>
-                </center>
-            </div>
-
-            <div class="row text-center" id="projects" style="display:none;">
-                <center>
-                    <h1>Projects</h1>
+                    <img src="img/classic-350-grey-front-2-3-angle-2-international.jpg" style="max-width: 37%;" />
                 </center>
             </div>
         </div>
+
     </body>
     <!-- Footer -->
-    <footer class="text-center text-white">
+    <footer class="text-center text-white webFooter">
         <div class="float-start p-3">
             <h6>Ragavan G</h6>
             <h6>Tiruppathur.</h6>
