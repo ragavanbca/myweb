@@ -1,161 +1,286 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <!-- CSS only -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+<head>
+    <meta charset="UTF-8" />
+    <title>Read Zip Images and Videos with Slideshow</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 20px;
+            font-family: Arial, sans-serif;
+        }
 
-        <!-- JavaScript Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous">
-            </script>
+        #mediaContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            max-width: 80vw;
+        }
 
-        <!-- Font Awesome -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+        .media-wrapper {
+            text-align: center;
+        }
 
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+        /* Popup styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
 
-        <!-- MDB -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/5.0.0/mdb.min.css" rel="stylesheet" />
+        .popup-content {
+            position: relative;
+            background: #fff;
+            padding: 10px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            text-align: center;
+        }
 
-        <!-- MDB -->
-        <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/5.0.0/mdb.min.js"></script>
+        .popup-content img,
+        .popup-content video {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            margin: 0 auto;
+        }
 
-        <link rel="icon" type="image/x-icon" href="img/cpu.svg">
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #333;
+            user-select: none;
+        }
 
-        <!-- Js CDN -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
-            integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer">
-            </script>
+        .download-btn {
+            margin-top: 10px;
+            display: inline-block;
+            padding: 5px 15px;
+            background: #1D7FBF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
-        <!-- Js File Link -->
-        <script type="text/javascript" src="main.js"></script>
-        
-        <!-- css File Link -->
-        <link rel="stylesheet" href="main.css" />
+        video {
+            background-color: black;
+            cursor: default;
+        }
 
-        <title>Ragavan</title>
-    </head>
+        /* Slideshow button */
+        #slideshowBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 18px;
+            background: #1D7FBF;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 1500;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
 
-    <body>
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light lineupAnimation">
-            <!-- Container wrapper -->
-            <div class="container-fluid">
-                <!-- Toggle button -->
-                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse"
-                    data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-bars"></i>
-                </button>
+        #slideshowBtn:hover {
+            background: #155a8a;
+        }
+    </style>
+</head>
 
-                <!-- Collapsible wrapper -->
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Navbar brand -->
-                    <a class="navbar-brand mt-2 mt-lg-0" href="#">
-                        <img src="img/photo_2022-07-09_22-58-59.jpg" height="45" alt="logo" loading="lazy" title="Ragavan"/>
-                    </a>
-                    <!-- Left links -->
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" id="dashboardButton" href="#Dashboard">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="teamButton" href="#team">Team</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="projectButton" href="#projects">Projects</a>
-                        </li>
-                    </ul>
-                    <!-- Left links -->
-                </div>
-                <!-- Collapsible wrapper -->
+<body>
+    <h2>Select a Zip File</h2>
+    <input type="file" id="zipInput" accept=".zip" />
 
-                <!-- Right elements -->
-                <div class="d-flex align-items-center">
-                    <!-- dark and light mode icon -->
-                    <div class="form-check form-switch" id="darkMode">
-                        <input class="form-check-input" type="checkbox" id="darkMode" value="1" onchange="switchcolor()">
-                        <label class="form-check-label" for="darkMode">Default switch checkbox
-                            input</label>
-                    </div>
+    <button id="slideshowBtn" title="Start Slideshow" disabled>Start Slideshow ▶️</button>
 
-                </div>
-                <!-- Right elements -->
-            </div>
-            <!-- Container wrapper -->
-        </nav>
-        <!-- Navbar -->
+    <div id="mediaContainer"></div>
 
-        <div class="row homePage text-center lineupAnimation" >
-            <div class="col-lg-6 col-md-6 col-sm-12 introText">
-                <h1>Ragavan</h1>
-            </div>
-
-            <div class="col-lg-6 col-md-6 col-sm-12">
-                <center>
-                    <img src="img/classic-350-grey-front-2-3-angle-2-international.jpg" style="max-width: 37%;" />
-                </center>
-            </div>
+    <!-- Popup -->
+    <div id="popup" class="popup-overlay">
+        <div class="popup-content">
+            <span class="close-btn" title="Close">&times;</span>
+            <img id="popupImage" src="" alt="Preview" style="display:none" />
+            <video id="popupVideo" controls autoplay muted loop style="display:none"></video>
+            <br />
+            <a id="downloadLink" href="#" class="download-btn" download>Download</a>
         </div>
+    </div>
 
-    </body>
-    <!-- Footer -->
-    <footer class="text-center text-white webFooter">
-        <div class="float-start p-3">
-            <h6>Ragavan G</h6>
-            <h6>Tiruppathur.</h6>
-        </div>
-        <!-- Grid container -->
-        <div class="container p-4">
-
-            <!-- Section: Social media -->
-            <section class="mb-4">
-                <!-- Facebook -->
-                <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i
-                        class="fab fa-facebook-f"></i></a>
-
-                <!-- Twitter -->
-                <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i
-                        class="fab fa-twitter"></i></a>
-
-                <!-- Google -->
-                <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i
-                        class="fab fa-google"></i></a>
-
-                <!-- Instagram -->
-                <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i
-                        class="fab fa-instagram"></i></a>
-
-                <!-- Linkedin -->
-                <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i
-                        class="fab fa-linkedin-in"></i></a>
-
-                <!-- Github -->
-                <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i
-                        class="fab fa-github"></i></a>
-            </section>
-            <!-- Section: Social media -->
-        </div>
-        <!-- Grid container -->
-
-        <!-- Copyright -->
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-            © 2020 Copyright
-        </div>
-        <!-- Copyright -->
-    </footer>
-    <!-- Footer -->
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
+        const mediaContainer = document.getElementById('mediaContainer');
+        const popup = document.getElementById('popup');
+        const popupImage = document.getElementById('popupImage');
+        const popupVideo = document.getElementById('popupVideo');
+        const downloadLink = document.getElementById('downloadLink');
+        const closeBtn = popup.querySelector('.close-btn');
+        const slideshowBtn = document.getElementById('slideshowBtn');
 
+        let mediaList = []; // {type: 'image'|'video', url, filename}
+        let slideshowIndex = 0;
+        let slideshowInterval = null;
+
+        // Clear old data and UI
+        function reset() {
+            mediaContainer.innerHTML = '';
+            popup.style.display = 'none';
+            mediaList = [];
+            slideshowIndex = 0;
+            clearInterval(slideshowInterval);
+            slideshowInterval = null;
+            slideshowBtn.disabled = true;
+        }
+
+        // Show popup media (image or video)
+        function showPopup(media) {
+            if (media.type === 'image') {
+                popupImage.src = media.url;
+                popupImage.style.display = 'block';
+                popupVideo.style.display = 'none';
+                popupVideo.pause();
+            } else if (media.type === 'video') {
+                popupVideo.src = media.url;
+                popupVideo.style.display = 'block';
+                popupVideo.muted = true;
+                popupVideo.autoplay = true;
+                popupVideo.loop = true;
+                popupVideo.style.backgroundColor = 'black';
+                popupImage.style.display = 'none';
+            }
+            downloadLink.href = media.url;
+            downloadLink.download = media.filename;
+
+            popup.style.display = 'flex';
+        }
+
+        // Show media in the list (images clickable, videos autoplay muted)
+        function addMediaToList(media) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'media-wrapper';
+
+            if (media.type === 'image') {
+                const img = document.createElement('img');
+                img.src = media.url;
+                img.style.width = '150px';
+                img.style.cursor = 'pointer';
+                img.title = media.filename;
+                img.onclick = () => {
+                    clearInterval(slideshowInterval);
+                    slideshowInterval = null;
+                    showPopup(media);
+                };
+                wrapper.appendChild(img);
+            } else if (media.type === 'video') {
+                const video = document.createElement('video');
+                video.src = media.url;
+                video.controls = true;
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = true;
+                video.style.width = '250px';
+                video.title = media.filename;
+                wrapper.appendChild(video);
+            }
+
+            mediaContainer.appendChild(wrapper);
+        }
+
+        document.getElementById('zipInput').addEventListener('change', function (event) {
+            reset();
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const zip = new JSZip();
+
+            zip
+                .loadAsync(file)
+                .then(async function (contents) {
+                    for (const filename of Object.keys(contents.files)) {
+                        const fileData = contents.files[filename];
+
+                        if (fileData.dir) continue;
+
+                        const ext = filename.split('.').pop().toLowerCase();
+                        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
+                        const isVideo = ['mp4', 'webm', 'ogg'].includes(ext);
+
+                        if (isImage || isVideo) {
+                            const blob = await fileData.async('blob');
+                            const url = URL.createObjectURL(blob);
+
+                            const mediaType = isImage ? 'image' : 'video';
+                            const media = { type: mediaType, url, filename };
+                            mediaList.push(media);
+                            addMediaToList(media);
+                        }
+                    }
+
+                    if (mediaList.length > 0) {
+                        slideshowBtn.disabled = false;
+                    }
+                })
+                .catch(function (err) {
+                    console.error('Failed to read zip file:', err);
+                });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            popup.style.display = 'none';
+            // Stop video if visible
+            popupVideo.pause();
+        });
+
+        // Close popup on clicking outside popup content
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+                popupVideo.pause();
+            }
+        });
+
+        // Slideshow functions
+        function startSlideshow() {
+            if (mediaList.length === 0) return;
+
+            slideshowIndex = 0;
+            showPopup(mediaList[slideshowIndex]);
+
+            slideshowInterval = setInterval(() => {
+                slideshowIndex++;
+                if (slideshowIndex >= mediaList.length) slideshowIndex = 0;
+                showPopup(mediaList[slideshowIndex]);
+            }, 2000); // Change slide every 4 seconds
+        }
+
+        slideshowBtn.addEventListener('click', () => {
+            startSlideshow();
+        });
     </script>
+</body>
 
 </html>
