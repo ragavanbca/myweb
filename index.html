@@ -173,6 +173,20 @@
         <div id="galleryThumbnails"></div>
     </div>
 
+    <!-- Fullscreen image viewer -->
+    <div id="fullscreenOverlay"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center; flex-direction: column;">
+        <button id="fsPrevBtn"
+            style="position:absolute; top:50%; left:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer; user-select:none;">&#10094;</button>
+        <img id="fullscreenImage" src="" alt="Fullscreen"
+            style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow: 0 0 20px #000;">
+        <button id="fsNextBtn"
+            style="position:absolute; top:50%; right:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer; user-select:none;">&#10095;</button>
+        <button id="fsCloseBtn"
+            style="position:absolute; top:20px; right:30px; font-size:2rem; background:none; border:none; color:white; cursor:pointer;">&times;</button>
+    </div>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         const mediaContainer = document.getElementById('mediaContainer');
@@ -338,6 +352,80 @@
             document.querySelector('.tab[data-tab="imagesTab"]').classList.add('active');
             mediaContainer.classList.add('active');
         });
+
+        const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+        const fullscreenImage = document.getElementById('fullscreenImage');
+        const fsNextBtn = document.getElementById('fsNextBtn');
+        const fsPrevBtn = document.getElementById('fsPrevBtn');
+        const fsCloseBtn = document.getElementById('fsCloseBtn');
+
+        let fullscreenIndex = 0;
+
+        function openFullscreen(index) {
+            fullscreenIndex = index;
+            fullscreenImage.src = images[fullscreenIndex].url;
+            fullscreenOverlay.style.display = 'flex';
+        }
+
+        function closeFullscreen() {
+            fullscreenOverlay.style.display = 'none';
+        }
+
+        function showNextImage() {
+            fullscreenIndex = (fullscreenIndex + 1) % images.length;
+            fullscreenImage.src = images[fullscreenIndex].url;
+        }
+
+        function showPrevImage() {
+            fullscreenIndex = (fullscreenIndex - 1 + images.length) % images.length;
+            fullscreenImage.src = images[fullscreenIndex].url;
+        }
+
+        fsNextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showNextImage();
+        });
+
+        fsPrevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPrevImage();
+        });
+
+        fsCloseBtn.addEventListener('click', () => {
+            closeFullscreen();
+        });
+
+        fullscreenOverlay.addEventListener('click', (e) => {
+            // Close if clicked outside the image
+            if (e.target === fullscreenOverlay) {
+                closeFullscreen();
+            }
+        });
+
+        img.onclick = () => {
+            // Find index of clicked image in images array
+            const index = images.findIndex(m => m.url === media.url);
+            if (index !== -1) openFullscreen(index);
+        };
+
+        function addImageToImagesTab(media) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'media-wrapper';
+
+            const img = document.createElement('img');
+            img.src = media.url;
+            img.style.width = '250px';
+            img.title = media.filename;
+
+            img.onclick = () => {
+                const index = images.findIndex(m => m.url === media.url);
+                if (index !== -1) openFullscreen(index);
+            };
+
+            wrapper.appendChild(img);
+            mediaContainer.appendChild(wrapper);
+        }
+
     </script>
 </body>
 
