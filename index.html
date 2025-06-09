@@ -173,19 +173,25 @@
         <div id="galleryThumbnails"></div>
     </div>
 
-    <!-- Fullscreen image viewer -->
+    <!-- Fullscreen media viewer -->
     <div id="fullscreenOverlay"
         style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center; flex-direction: column;">
         <button id="fsPrevBtn"
             style="position:absolute; top:50%; left:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer; user-select:none;">&#10094;</button>
+
         <img id="fullscreenImage" src="" alt="Fullscreen"
-            style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow: 0 0 20px #000;">
+            style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow: 0 0 20px #000; display:none;">
+
+        <video id="fullscreenVideo" controls autoplay muted loop
+            style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow: 0 0 20px #000; display:none;">
+            Sorry, your browser doesn't support embedded videos.
+        </video>
+
         <button id="fsNextBtn"
             style="position:absolute; top:50%; right:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer; user-select:none;">&#10095;</button>
         <button id="fsCloseBtn"
             style="position:absolute; top:20px; right:30px; font-size:2rem; background:none; border:none; color:white; cursor:pointer;">&times;</button>
     </div>
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
@@ -201,6 +207,7 @@
         let gallerySlideshowInterval = null;
         let isAnimating = false;
 
+        // Add image thumbnail in Images tab
         function addImageToImagesTab(media) {
             const wrapper = document.createElement('div');
             wrapper.className = 'media-wrapper';
@@ -210,10 +217,16 @@
             img.style.width = '250px';
             img.title = media.filename;
 
+            img.onclick = () => {
+                const index = images.findIndex(m => m.url === media.url);
+                if (index !== -1) openFullscreen(index, 'image');
+            };
+
             wrapper.appendChild(img);
             mediaContainer.appendChild(wrapper);
         }
 
+        // Add video thumbnail in Videos tab
         function addVideoToVideosTab(media) {
             const wrapper = document.createElement('div');
             wrapper.className = 'media-wrapper';
@@ -221,24 +234,26 @@
             const video = document.createElement('video');
             video.src = media.url;
             video.controls = true;
-            video.autoplay = true;
+            video.autoplay = true; // no autoplay in thumbnail
             video.muted = true;
             video.loop = true;
             video.style.width = '250px';
+
+            video.onclick = () => {
+                const index = videos.findIndex(m => m.url === media.url);
+                if (index !== -1) openFullscreen(index, 'video');
+            };
 
             wrapper.appendChild(video);
             videoContainer.appendChild(wrapper);
         }
 
+        // Setup gallery thumbnails and background
         function setupGallery() {
             if (images.length === 0) return;
 
-            if (!galleryBackground.style.backgroundImage) {
-                setGalleryBackground(images[0].url);
-                updateThumbnailSelection(0);
-            }
-
             galleryThumbnails.innerHTML = '';
+
             images.forEach((media, idx) => {
                 const thumb = document.createElement('img');
                 thumb.src = media.url;
@@ -246,19 +261,26 @@
                 if (idx === 0) thumb.classList.add('selected');
                 thumb.onclick = () => {
                     clearInterval(gallerySlideshowInterval);
+                    gallerySlideshowIndex = idx;
                     setGalleryBackground(media.url);
                     updateThumbnailSelection(idx);
                 };
                 galleryThumbnails.appendChild(thumb);
             });
+
+            // Set initial gallery background
+            setGalleryBackground(images[0].url);
+            updateThumbnailSelection(0);
         }
 
+        // Update selected thumbnail styling
         function updateThumbnailSelection(index) {
             galleryThumbnails.querySelectorAll('img').forEach((img, i) => {
                 img.classList.toggle('selected', i === index);
             });
         }
 
+        // Fade transition for gallery background
         function setGalleryBackground(url) {
             if (isAnimating) return;
             isAnimating = true;
@@ -273,6 +295,7 @@
             }, 500);
         }
 
+        // Start the slideshow in gallery tab
         function startGallerySlideshow() {
             if (images.length === 0) return;
 
@@ -288,6 +311,7 @@
             }, 3000);
         }
 
+        // Tabs click handling
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
@@ -311,9 +335,20 @@
             });
         });
 
+        // Handle ZIP input and extract media files
         document.getElementById('zipInput').addEventListener('change', async function (event) {
             const files = event.target.files;
             if (!files.length) return;
+
+            // Clear previous content
+            images = [];
+            videos = [];
+            mediaContainer.innerHTML = '';
+            videoContainer.innerHTML = '';
+            galleryThumbnails.innerHTML = '';
+            galleryBackground.style.backgroundImage = '';
+            galleryBackground.style.opacity = 0;
+            clearInterval(gallerySlideshowInterval);
 
             for (const file of files) {
                 const zip = new JSZip();
@@ -348,47 +383,88 @@
 
             setupGallery();
 
+            // Show images tab by default
             tabs.forEach(t => t.classList.remove('active'));
             document.querySelector('.tab[data-tab="imagesTab"]').classList.add('active');
             mediaContainer.classList.add('active');
         });
 
+        // Fullscreen viewer elements
         const fullscreenOverlay = document.getElementById('fullscreenOverlay');
         const fullscreenImage = document.getElementById('fullscreenImage');
+        const fullscreenVideo = document.getElementById('fullscreenVideo');
         const fsNextBtn = document.getElementById('fsNextBtn');
         const fsPrevBtn = document.getElementById('fsPrevBtn');
         const fsCloseBtn = document.getElementById('fsCloseBtn');
 
         let fullscreenIndex = 0;
+        let fullscreenMediaType = 'image'; // 'image' or 'video'
 
-        function openFullscreen(index) {
+        // Open fullscreen for image or video
+        function openFullscreen(index, type) {
             fullscreenIndex = index;
-            fullscreenImage.src = images[fullscreenIndex].url;
+            fullscreenMediaType = type;
+
+            if (type === 'image') {
+                fullscreenVideo.style.display = 'none';
+                fullscreenVideo.pause();
+                fullscreenImage.style.display = 'block';
+                fullscreenImage.src = images[index].url;
+            } else if (type === 'video') {
+                fullscreenImage.style.display = 'none';
+                fullscreenVideo.style.display = 'block';
+                fullscreenVideo.src = videos[index].url;
+                fullscreenVideo.play();
+            }
+
             fullscreenOverlay.style.display = 'flex';
         }
 
+        // Close fullscreen viewer
         function closeFullscreen() {
             fullscreenOverlay.style.display = 'none';
+            fullscreenVideo.pause();
+            fullscreenVideo.src = '';
+            fullscreenImage.src = '';
         }
 
-        function showNextImage() {
-            fullscreenIndex = (fullscreenIndex + 1) % images.length;
-            fullscreenImage.src = images[fullscreenIndex].url;
+        // Show next media in fullscreen
+        function showNextMedia() {
+            if (fullscreenMediaType === 'image') {
+                if (images.length === 0) return;
+                fullscreenIndex = (fullscreenIndex + 1) % images.length;
+                fullscreenImage.src = images[fullscreenIndex].url;
+            } else if (fullscreenMediaType === 'video') {
+                if (videos.length === 0) return;
+                fullscreenIndex = (fullscreenIndex + 1) % videos.length;
+                fullscreenVideo.src = videos[fullscreenIndex].url;
+                fullscreenVideo.play();
+            }
         }
 
-        function showPrevImage() {
-            fullscreenIndex = (fullscreenIndex - 1 + images.length) % images.length;
-            fullscreenImage.src = images[fullscreenIndex].url;
+        // Show previous media in fullscreen
+        function showPrevMedia() {
+            if (fullscreenMediaType === 'image') {
+                if (images.length === 0) return;
+                fullscreenIndex = (fullscreenIndex - 1 + images.length) % images.length;
+                fullscreenImage.src = images[fullscreenIndex].url;
+            } else if (fullscreenMediaType === 'video') {
+                if (videos.length === 0) return;
+                fullscreenIndex = (fullscreenIndex - 1 + videos.length) % videos.length;
+                fullscreenVideo.src = videos[fullscreenIndex].url;
+                fullscreenVideo.play();
+            }
         }
 
+        // Event listeners for fullscreen controls
         fsNextBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            showNextImage();
+            showNextMedia();
         });
 
         fsPrevBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            showPrevImage();
+            showPrevMedia();
         });
 
         fsCloseBtn.addEventListener('click', () => {
@@ -396,35 +472,10 @@
         });
 
         fullscreenOverlay.addEventListener('click', (e) => {
-            // Close if clicked outside the image
             if (e.target === fullscreenOverlay) {
                 closeFullscreen();
             }
         });
-
-        img.onclick = () => {
-            // Find index of clicked image in images array
-            const index = images.findIndex(m => m.url === media.url);
-            if (index !== -1) openFullscreen(index);
-        };
-
-        function addImageToImagesTab(media) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'media-wrapper';
-
-            const img = document.createElement('img');
-            img.src = media.url;
-            img.style.width = '250px';
-            img.title = media.filename;
-
-            img.onclick = () => {
-                const index = images.findIndex(m => m.url === media.url);
-                if (index !== -1) openFullscreen(index);
-            };
-
-            wrapper.appendChild(img);
-            mediaContainer.appendChild(wrapper);
-        }
 
     </script>
 </body>
