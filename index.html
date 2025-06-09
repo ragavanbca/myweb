@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Read Zip Images and Videos with Slideshow and Tabs</title>
+    <title>Gallery Slideshow with Fade & Multi-Zip</title>
     <style>
         html,
         body {
@@ -54,7 +54,6 @@
             border-color: #1D7FBF;
         }
 
-        /* Container for media lists */
         #mediaContainer,
         #videoContainer,
         #galleryContainer {
@@ -62,7 +61,6 @@
             overflow-y: auto;
             margin-top: 10px;
             display: none;
-            /* Hide by default */
         }
 
         #mediaContainer.active,
@@ -83,92 +81,10 @@
             text-align: center;
         }
 
-        /* Popup styles */
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
+        #galleryContainer {
+            flex-direction: column;
         }
 
-        .popup-content {
-            position: relative;
-            background: #fff;
-            padding: 10px;
-            max-width: 90%;
-            max-height: 90%;
-            overflow: auto;
-            text-align: center;
-        }
-
-        .popup-content img,
-        .popup-content video {
-            width: auto;
-            height: auto;
-            max-width: 100%;
-            max-height: 80vh;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            font-size: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #333;
-            user-select: none;
-        }
-
-        .download-btn {
-            margin-top: 10px;
-            display: inline-block;
-            padding: 5px 15px;
-            background: #1D7FBF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        video {
-            background-color: black;
-            cursor: default;
-        }
-
-        /* Slideshow button */
-        #slideshowBtn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 18px;
-            background: #1D7FBF;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            user-select: none;
-            z-index: 1500;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s ease;
-        }
-
-        #slideshowBtn:hover {
-            background: #155a8a;
-        }
-
-        /* Gallery styles */
         #galleryBackground {
             flex: 1;
             background-position: center;
@@ -176,6 +92,9 @@
             background-size: contain;
             border: 1px solid #ddd;
             margin-bottom: 10px;
+            height: 60vh;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
         }
 
         #galleryThumbnails {
@@ -190,36 +109,55 @@
             cursor: pointer;
             border: 2px solid transparent;
             border-radius: 6px;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #galleryThumbnails img:hover {
+            transform: scale(1.2);
+            border-color: #1D7FBF;
+            z-index: 10;
         }
 
         #galleryThumbnails img.selected {
             border-color: #1D7FBF;
         }
 
-        #galleryThumbnails img {
-            height: 80px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            border-radius: 6px;
-            transition: border-color 0.3s ease, transform 0.3s ease;
-            /* added transform transition */
-        }
+        @media screen and (max-width: 600px) {
+            #tabsHeader {
+                flex-direction: column;
+                align-items: center;
+            }
 
-        #galleryThumbnails img:hover {
-            transform: scale(1.2);
-            z-index: 10;
-            /* make sure zoomed image is above others */
-            border-color: #1D7FBF;
+            .tab {
+                width: 100%;
+                text-align: center;
+            }
+
+            #galleryBackground {
+                height: 50vh;
+            }
+
+            #galleryThumbnails img {
+                height: 60px;
+            }
+
+            #mediaContainer,
+            #videoContainer {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            img {
+                width: 200px !important;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h2>Select a Zip File</h2>
-    <input type="file" id="zipInput" accept=".zip" />
 
-    <button id="slideshowBtn" title="Start Slideshow" disabled>Start Slideshow ▶️</button>
+    <h2>Select Zip Files</h2>
+    <input type="file" id="zipInput" accept=".zip" multiple />
 
     <div id="tabsHeader">
         <div class="tab active" data-tab="imagesTab">Images</div>
@@ -230,20 +168,9 @@
     <div id="mediaContainer" class="active"></div>
     <div id="videoContainer"></div>
 
-    <div id="galleryContainer" style="flex-direction: column;">
-        <div id="galleryBackground" style="height: 60vh;"></div>
+    <div id="galleryContainer">
+        <div id="galleryBackground"></div>
         <div id="galleryThumbnails"></div>
-    </div>
-
-    <!-- Popup -->
-    <div id="popup" class="popup-overlay">
-        <div class="popup-content">
-            <span class="close-btn" title="Close">&times;</span>
-            <img id="popupImage" src="" alt="Preview" style="display:none" />
-            <video id="popupVideo" controls autoplay muted loop style="display:none"></video>
-            <br />
-            <a id="downloadLink" href="#" class="download-btn" download>Download</a>
-        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -253,58 +180,26 @@
         const galleryContainer = document.getElementById('galleryContainer');
         const galleryBackground = document.getElementById('galleryBackground');
         const galleryThumbnails = document.getElementById('galleryThumbnails');
-
-        const popup = document.getElementById('popup');
-        const popupImage = document.getElementById('popupImage');
-        const popupVideo = document.getElementById('popupVideo');
-        const downloadLink = document.getElementById('downloadLink');
-        const closeBtn = popup.querySelector('.close-btn');
-        const slideshowBtn = document.getElementById('slideshowBtn');
-
         const tabs = document.querySelectorAll('#tabsHeader .tab');
 
-        let images = [];
-        let videos = [];
-        let slideshowIndex = 0;
-        let slideshowInterval = null;
+        let images = [], videos = [];
+        let gallerySlideshowIndex = 0;
+        let gallerySlideshowInterval = null;
+        let isAnimating = false;
 
-        // Reset all containers & variables
-        function reset() {
-            mediaContainer.innerHTML = '';
-            videoContainer.innerHTML = '';
-            galleryBackground.style.backgroundImage = '';
-            galleryThumbnails.innerHTML = '';
-            popup.style.display = 'none';
-
-            images = [];
-            videos = [];
-            slideshowIndex = 0;
-            clearInterval(slideshowInterval);
-            slideshowInterval = null;
-            slideshowBtn.disabled = true;
-        }
-
-        // Add image thumbnail for Images tab
         function addImageToImagesTab(media) {
             const wrapper = document.createElement('div');
             wrapper.className = 'media-wrapper';
 
             const img = document.createElement('img');
             img.src = media.url;
-            img.style.width = '150px';
-            img.style.cursor = 'pointer';
+            img.style.width = '250px';
             img.title = media.filename;
-            img.onclick = () => {
-                clearInterval(slideshowInterval);
-                slideshowInterval = null;
-                showPopup(media);
-            };
 
             wrapper.appendChild(img);
             mediaContainer.appendChild(wrapper);
         }
 
-        // Add video thumbnail for Videos tab
         function addVideoToVideosTab(media) {
             const wrapper = document.createElement('div');
             wrapper.className = 'media-wrapper';
@@ -316,65 +211,69 @@
             video.muted = true;
             video.loop = true;
             video.style.width = '250px';
-            video.title = media.filename;
 
             wrapper.appendChild(video);
             videoContainer.appendChild(wrapper);
         }
 
-        // Add images for Gallery tab
         function setupGallery() {
-            if (images.length === 0) {
-                galleryBackground.style.backgroundImage = '';
-                galleryThumbnails.innerHTML = '';
-                return;
-            }
+            if (images.length === 0) return;
 
-            // Set first image as background
-            setGalleryBackground(images[0].url);
+            if (!galleryBackground.style.backgroundImage) {
+                setGalleryBackground(images[0].url);
+                updateThumbnailSelection(0);
+            }
 
             galleryThumbnails.innerHTML = '';
             images.forEach((media, idx) => {
                 const thumb = document.createElement('img');
                 thumb.src = media.url;
                 thumb.title = media.filename;
-                thumb.classList.toggle('selected', idx === 0);
+                if (idx === 0) thumb.classList.add('selected');
                 thumb.onclick = () => {
+                    clearInterval(gallerySlideshowInterval);
                     setGalleryBackground(media.url);
-                    // Update selected border
-                    galleryThumbnails.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
-                    thumb.classList.add('selected');
+                    updateThumbnailSelection(idx);
                 };
                 galleryThumbnails.appendChild(thumb);
             });
         }
 
+        function updateThumbnailSelection(index) {
+            galleryThumbnails.querySelectorAll('img').forEach((img, i) => {
+                img.classList.toggle('selected', i === index);
+            });
+        }
+
         function setGalleryBackground(url) {
-            galleryBackground.style.backgroundImage = `url('${url}')`;
+            if (isAnimating) return;
+            isAnimating = true;
+
+            galleryBackground.style.opacity = 0;
+            setTimeout(() => {
+                galleryBackground.style.backgroundImage = `url('${url}')`;
+                galleryBackground.style.opacity = 1;
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 1000);
+            }, 500);
         }
 
-        // Show popup media (image or video)
-        function showPopup(media) {
-            if (media.type === 'image') {
-                popupImage.src = media.url;
-                popupImage.style.display = 'block';
-                popupVideo.style.display = 'none';
-                popupVideo.pause();
-            } else if (media.type === 'video') {
-                popupVideo.src = media.url;
-                popupVideo.style.display = 'block';
-                popupVideo.muted = true;
-                popupVideo.autoplay = true;
-                popupVideo.loop = true;
-                popupImage.style.display = 'none';
-            }
-            downloadLink.href = media.url;
-            downloadLink.download = media.filename;
+        function startGallerySlideshow() {
+            if (images.length === 0) return;
 
-            popup.style.display = 'flex';
+            clearInterval(gallerySlideshowInterval);
+            gallerySlideshowIndex = 0;
+            setGalleryBackground(images[gallerySlideshowIndex].url);
+            updateThumbnailSelection(gallerySlideshowIndex);
+
+            gallerySlideshowInterval = setInterval(() => {
+                gallerySlideshowIndex = (gallerySlideshowIndex + 1) % images.length;
+                setGalleryBackground(images[gallerySlideshowIndex].url);
+                updateThumbnailSelection(gallerySlideshowIndex);
+            }, 3000);
         }
 
-        // Tab switching logic
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
@@ -382,35 +281,32 @@
 
                 const target = tab.getAttribute('data-tab');
 
-                // Hide all containers
                 mediaContainer.classList.remove('active');
                 videoContainer.classList.remove('active');
                 galleryContainer.classList.remove('active');
+                clearInterval(gallerySlideshowInterval);
 
-                // Show selected container
                 if (target === 'imagesTab') {
                     mediaContainer.classList.add('active');
                 } else if (target === 'videosTab') {
                     videoContainer.classList.add('active');
                 } else if (target === 'galleryTab') {
                     galleryContainer.classList.add('active');
+                    startGallerySlideshow();
                 }
             });
         });
 
-        document.getElementById('zipInput').addEventListener('change', function (event) {
-            reset();
-            const file = event.target.files[0];
-            if (!file) return;
+        document.getElementById('zipInput').addEventListener('change', async function (event) {
+            const files = event.target.files;
+            if (!files.length) return;
 
-            const zip = new JSZip();
-
-            zip
-                .loadAsync(file)
-                .then(async function (contents) {
+            for (const file of files) {
+                const zip = new JSZip();
+                try {
+                    const contents = await zip.loadAsync(file);
                     for (const filename of Object.keys(contents.files)) {
                         const fileData = contents.files[filename];
-
                         if (fileData.dir) continue;
 
                         const ext = filename.split('.').pop().toLowerCase();
@@ -420,8 +316,7 @@
                         if (isImage || isVideo) {
                             const blob = await fileData.async('blob');
                             const url = URL.createObjectURL(blob);
-                            const mediaType = isImage ? 'image' : 'video';
-                            const media = { type: mediaType, url, filename };
+                            const media = { type: isImage ? 'image' : 'video', url, filename };
 
                             if (isImage) {
                                 images.push(media);
@@ -432,56 +327,17 @@
                             }
                         }
                     }
-
-                    if (images.length + videos.length > 0) {
-                        slideshowBtn.disabled = false;
-                    }
-
-                    // Prepare gallery
-                    setupGallery();
-
-                    // Show images tab by default
-                    tabs.forEach(t => t.classList.remove('active'));
-                    document.querySelector('.tab[data-tab="imagesTab"]').classList.add('active');
-
-                    mediaContainer.classList.add('active');
-                })
-                .catch(function (err) {
-                    console.error('Failed to read zip file:', err);
-                });
-        });
-
-        closeBtn.addEventListener('click', () => {
-            popup.style.display = 'none';
-            popupVideo.pause();
-        });
-
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) {
-                popup.style.display = 'none';
-                popupVideo.pause();
+                } catch (err) {
+                    console.error(`Error reading ZIP file: ${file.name}`, err);
+                }
             }
+
+            setupGallery();
+
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelector('.tab[data-tab="imagesTab"]').classList.add('active');
+            mediaContainer.classList.add('active');
         });
-
-        // Slideshow functions
-        function startSlideshow() {
-            const allMedia = [...images, ...videos];
-            if (allMedia.length === 0) return;
-
-            slideshowIndex = 0;
-            showPopup(allMedia[slideshowIndex]);
-
-            slideshowInterval = setInterval(() => {
-                slideshowIndex++;
-                if (slideshowIndex >= allMedia.length) slideshowIndex = 0;
-                showPopup(allMedia[slideshowIndex]);
-            }, 2000); // Change slide every 2 seconds
-        }
-
-        slideshowBtn.addEventListener('click', () => {
-            startSlideshow();
-        });
-
     </script>
 </body>
 
