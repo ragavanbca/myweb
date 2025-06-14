@@ -36,7 +36,7 @@ function addVideoToVideosTab(media) {
             controls: true,
             autoplay: true,
             muted: true,
-            loop: true
+            loop: false
         })
         .addClass('img-fluid rounded')
         .css('width', '235px')
