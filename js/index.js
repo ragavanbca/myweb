@@ -135,6 +135,130 @@ tabs.on('click', function (e) {
     }
 });
 
+
+// Pagination variables
+let imagesPage = 1, videosPage = 1;
+const IMAGES_PER_PAGE = 20, VIDEOS_PER_PAGE = 10;
+
+// Pagination controls (add these elements in your HTML as needed)
+const imagesPagination = $('#imagesPagination');
+const videosPagination = $('#videosPagination');
+
+function renderImagesPage(page = 1) {
+    mediaContainer.empty();
+    const start = (page - 1) * IMAGES_PER_PAGE;
+    const end = start + IMAGES_PER_PAGE;
+    images.slice(start, end).forEach(addImageToImagesTab);
+    renderImagesPagination();
+}
+
+function renderVideosPage(page = 1) {
+    videoContainer.empty();
+    const start = (page - 1) * VIDEOS_PER_PAGE;
+    const end = start + VIDEOS_PER_PAGE;
+    videos.slice(start, end).forEach(addVideoToVideosTab);
+    renderVideosPagination();
+}
+function renderImagesPagination() {
+    imagesPagination.empty();
+    const totalPages = Math.ceil(images.length / IMAGES_PER_PAGE);
+    if (totalPages <= 1) return;
+
+    // Previous button
+    const prevBtn = $('<button>')
+        .addClass('page-btn btn-light px-1')
+        .prop('disabled', imagesPage === 1)
+        .text('Prev')
+        .on('click', function () {
+            if (imagesPage > 1) {
+                imagesPage--;
+                renderImagesPage(imagesPage);
+            }
+        });
+    imagesPagination.append(prevBtn);
+
+    // Page numbers (show max 5)
+    let startPage = Math.max(1, imagesPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+    for (let i = startPage; i <= endPage; i++) {
+        const btn = $('<button>')
+            .addClass('page-btn btn-light px-1')
+            .toggleClass('active', i === imagesPage)
+            .text(i)
+            .on('click', function () {
+                imagesPage = i;
+                renderImagesPage(imagesPage);
+            });
+        imagesPagination.append(btn);
+    }
+
+    // Next button
+    const nextBtn = $('<button>')
+        .addClass('page-btn btn-light px-1')
+        .prop('disabled', imagesPage === totalPages)
+        .text('Next')
+        .on('click', function () {
+            if (imagesPage < totalPages) {
+                imagesPage++;
+                renderImagesPage(imagesPage);
+            }
+        });
+    imagesPagination.append(nextBtn);
+}
+
+function renderVideosPagination() {
+    videosPagination.empty();
+    const totalPages = Math.ceil(videos.length / VIDEOS_PER_PAGE);
+    if (totalPages <= 1) return;
+
+    // Previous button
+    const prevBtn = $('<button>')
+        .addClass('page-btn  btn-light px-1')
+        .prop('disabled', videosPage === 1)
+        .text('Prev')
+        .on('click', function () {
+            if (videosPage > 1) {
+                videosPage--;
+                renderVideosPage(videosPage);
+            }
+        });
+    videosPagination.append(prevBtn);
+
+    // Page numbers (show max 5)
+    let startPage = Math.max(1, videosPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+    for (let i = startPage; i <= endPage; i++) {
+        const btn = $('<button>')
+            .addClass('page-btn  btn-light px-1')
+            .toggleClass('active', i === videosPage)
+            .text(i)
+            .on('click', function () {
+                videosPage = i;
+                renderVideosPage(videosPage);
+            });
+        videosPagination.append(btn);
+    }
+
+    // Next button
+    const nextBtn = $('<button>')
+        .addClass('page-btn  btn-light px-1')
+        .prop('disabled', videosPage === totalPages)
+        .text('Next')
+        .on('click', function () {
+            if (videosPage < totalPages) {
+                videosPage++;
+                renderVideosPage(videosPage);
+            }
+        });
+    videosPagination.append(nextBtn);
+}
+
 processZipBtn.on('click', async function () {
     const files = zipInput[0].files;
     if (!files.length) {
@@ -144,8 +268,12 @@ processZipBtn.on('click', async function () {
 
     images = [];
     videos = [];
+    imagesPage = 1;
+    videosPage = 1;
     mediaContainer.empty();
     videoContainer.empty();
+    imagesPagination.empty();
+    videosPagination.empty();
     galleryThumbnails.empty();
     galleryBackground.css({ 'background-image': '', 'opacity': 0 });
     clearInterval(gallerySlideshowInterval);
@@ -169,10 +297,8 @@ processZipBtn.on('click', async function () {
 
                     if (isImage) {
                         images.push(media);
-                        addImageToImagesTab(media);
                     } else {
                         videos.push(media);
-                        addVideoToVideosTab(media);
                     }
                 }
             }
@@ -195,11 +321,41 @@ processZipBtn.on('click', async function () {
         }
     }
 
+    renderImagesPage(imagesPage);
+    renderVideosPage(videosPage);
     setupGallery();
 
     tabs.removeClass('active');
     $('.tab[data-tab="imagesTab"]').addClass('active');
     mediaContainer.addClass('active');
+});
+
+// When switching tabs, re-render the correct page
+tabs.on('click', function (e) {
+    e.preventDefault();
+    tabs.removeClass('active');
+    $(this).addClass('active');
+
+    const target = $(this).data('tab');
+
+    mediaContainer.removeClass('active');
+    videoContainer.removeClass('active');
+    galleryContainer.removeClass('active');
+    clearInterval(gallerySlideshowInterval);
+
+    if (target === 'imagesTab') {
+        renderImagesPage(imagesPage);
+        mediaContainer.addClass('active');
+        $('#imagesPagination').removeClass('d-none');
+    } else if (target === 'videosTab') {
+        renderVideosPage(videosPage);
+        videoContainer.addClass('active');
+        $('#imagesPagination').addClass('d-none');
+        $('#videosPagination').removeClass('d-none');
+    } else if (target === 'galleryTab') {
+        galleryContainer.addClass('active');
+        startGallerySlideshow();
+    }
 });
 
 // Fullscreen handling
