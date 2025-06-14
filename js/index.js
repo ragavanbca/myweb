@@ -17,7 +17,7 @@ function addImageToImagesTab(media) {
     const img = $('<img>')
         .attr('src', media.url)
         .addClass('img-fluid rounded')
-        .css('width', '250px')
+        .css('width', '235px')
         .attr('title', media.filename)
         .on('click', function () {
             const index = images.findIndex(m => m.url === media.url);
@@ -34,12 +34,12 @@ function addVideoToVideosTab(media) {
         .attr({
             src: media.url,
             controls: true,
-            autoplay: false,
+            autoplay: true,
             muted: true,
             loop: true
         })
         .addClass('img-fluid rounded')
-        .css('width', '250px')
+        .css('width', '235px')
         .on('click', function () {
             const index = videos.findIndex(m => m.url === media.url);
             if (index !== -1) openFullscreen(index, 'video');
