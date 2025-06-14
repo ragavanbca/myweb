@@ -1,116 +1,104 @@
-const mediaContainer = document.getElementById('mediaContainer');
-const videoContainer = document.getElementById('videoContainer');
-const galleryContainer = document.getElementById('galleryContainer');
-const galleryBackground = document.getElementById('galleryBackground');
-const galleryThumbnails = document.getElementById('galleryThumbnails');
-const tabs = document.querySelectorAll('#tabsHeader .tab'); // Selector reverted to target the tabs within the new ul
-const zipInput = document.getElementById('zipInput');
-const processZipBtn = document.getElementById('processZipBtn');
-const uploadZipModal = new bootstrap.Modal(document.getElementById('uploadZipModal'));
-
+const mediaContainer = $('#mediaContainer');
+const videoContainer = $('#videoContainer');
+const galleryContainer = $('#galleryContainer');
+const galleryBackground = $('#galleryBackground');
+const galleryThumbnails = $('#galleryThumbnails');
+const tabs = $('#tabsHeader .tab');
+const zipInput = $('#zipInput');
+const processZipBtn = $('#processZipBtn');
 
 let images = [], videos = [];
 let gallerySlideshowIndex = 0;
 let gallerySlideshowInterval = null;
 let isAnimating = false;
 
-// Add image thumbnail in Images tab
 function addImageToImagesTab(media) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'media-wrapper';
+    const wrapper = $('<div>').addClass('media-wrapper');
+    const img = $('<img>')
+        .attr('src', media.url)
+        .addClass('img-fluid rounded')
+        .css('width', '250px')
+        .attr('title', media.filename)
+        .on('click', function () {
+            const index = images.findIndex(m => m.url === media.url);
+            if (index !== -1) openFullscreen(index, 'image');
+        });
 
-    const img = document.createElement('img');
-    img.src = media.url;
-    img.classList.add('img-fluid', 'rounded'); // Bootstrap classes
-    img.style.width = '250px';
-    img.title = media.filename;
-
-    img.onclick = () => {
-        const index = images.findIndex(m => m.url === media.url);
-        if (index !== -1) openFullscreen(index, 'image');
-    };
-
-    wrapper.appendChild(img);
-    mediaContainer.appendChild(wrapper);
+    wrapper.append(img);
+    mediaContainer.append(wrapper);
 }
 
-// Add video thumbnail in Videos tab
 function addVideoToVideosTab(media) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'media-wrapper';
+    const wrapper = $('<div>').addClass('media-wrapper');
+    const video = $('<video>')
+        .attr({
+            src: media.url,
+            controls: true,
+            autoplay: false,
+            muted: true,
+            loop: true
+        })
+        .addClass('img-fluid rounded')
+        .css('width', '250px')
+        .on('click', function () {
+            const index = videos.findIndex(m => m.url === media.url);
+            if (index !== -1) openFullscreen(index, 'video');
+        });
 
-    const video = document.createElement('video');
-    video.src = media.url;
-    video.controls = true;
-    video.autoplay = false; // No autoplay in thumbnail
-    video.muted = true;
-    video.loop = true;
-    video.classList.add('img-fluid', 'rounded'); // Bootstrap classes
-    video.style.width = '250px';
-
-    video.onclick = () => {
-        const index = videos.findIndex(m => m.url === media.url);
-        if (index !== -1) openFullscreen(index, 'video');
-    };
-
-    wrapper.appendChild(video);
-    videoContainer.appendChild(wrapper);
+    wrapper.append(video);
+    videoContainer.append(wrapper);
 }
 
-// Setup gallery thumbnails and background
 function setupGallery() {
     if (images.length === 0) return;
 
-    galleryThumbnails.innerHTML = '';
+    galleryThumbnails.empty();
 
     images.forEach((media, idx) => {
-        const thumb = document.createElement('img');
-        thumb.src = media.url;
-        thumb.title = media.filename;
-        thumb.classList.add('img-thumbnail'); // Bootstrap class for thumbnails
-        if (idx === 0) thumb.classList.add('selected');
-        thumb.onclick = () => {
-            clearInterval(gallerySlideshowInterval);
-            gallerySlideshowIndex = idx;
-            setGalleryBackground(media.url);
-            updateThumbnailSelection(idx);
-        };
-        galleryThumbnails.appendChild(thumb);
+        const thumb = $('<img>')
+            .attr('src', media.url)
+            .attr('title', media.filename)
+            .addClass('img-thumbnail')
+            .toggleClass('selected', idx === 0)
+            .on('click', function () {
+                clearInterval(gallerySlideshowInterval);
+                gallerySlideshowIndex = idx;
+                setGalleryBackground(media.url);
+                updateThumbnailSelection(idx);
+            });
+
+        galleryThumbnails.append(thumb);
     });
 
-    // Set initial gallery background
     setGalleryBackground(images[0].url);
     updateThumbnailSelection(0);
 }
 
-// Update selected thumbnail styling
 function updateThumbnailSelection(index) {
-    galleryThumbnails.querySelectorAll('img').forEach((img, i) => {
-        img.classList.toggle('selected', i === index);
+    galleryThumbnails.find('img').each(function (i) {
+        $(this).toggleClass('selected', i === index);
     });
-    // Scroll selected thumbnail into view
-    const selectedThumb = galleryThumbnails.querySelector('.selected');
-    if (selectedThumb) {
-        selectedThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+    const selectedThumb = galleryThumbnails.find('.selected');
+    if (selectedThumb.length) {
+        selectedThumb[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
 }
 
-// Fade transition for gallery background
 function setGalleryBackground(url) {
     if (isAnimating) return;
     isAnimating = true;
 
-    galleryBackground.style.opacity = 0;
+    galleryBackground.css('opacity', 0);
     setTimeout(() => {
-        galleryBackground.style.backgroundImage = `url('${url}')`;
-        galleryBackground.style.opacity = 1;
+        galleryBackground.css('background-image', `url('${url}')`);
+        galleryBackground.css('opacity', 1);
         setTimeout(() => {
             isAnimating = false;
         }, 1000);
     }, 500);
 }
 
-// Start the slideshow in gallery tab
 function startGallerySlideshow() {
     if (images.length === 0) return;
 
@@ -125,50 +113,41 @@ function startGallerySlideshow() {
     }, 3000);
 }
 
-// Tabs click handling
-tabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent default link behavior
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+tabs.on('click', function (e) {
+    e.preventDefault();
+    tabs.removeClass('active');
+    $(this).addClass('active');
 
-        const target = tab.getAttribute('data-tab');
+    const target = $(this).data('tab');
 
-        mediaContainer.classList.remove('active');
-        videoContainer.classList.remove('active');
-        galleryContainer.classList.remove('active');
-        clearInterval(gallerySlideshowInterval);
+    mediaContainer.removeClass('active');
+    videoContainer.removeClass('active');
+    galleryContainer.removeClass('active');
+    clearInterval(gallerySlideshowInterval);
 
-        if (target === 'imagesTab') {
-            mediaContainer.classList.add('active');
-        } else if (target === 'videosTab') {
-            videoContainer.classList.add('active');
-        } else if (target === 'galleryTab') {
-            galleryContainer.classList.add('active');
-            startGallerySlideshow();
-        }
-    });
+    if (target === 'imagesTab') {
+        mediaContainer.addClass('active');
+    } else if (target === 'videosTab') {
+        videoContainer.addClass('active');
+    } else if (target === 'galleryTab') {
+        galleryContainer.addClass('active');
+        startGallerySlideshow();
+    }
 });
 
-// Handle ZIP input and extract media files
-processZipBtn.addEventListener('click', async function () {
-    const files = zipInput.files;
+processZipBtn.on('click', async function () {
+    const files = zipInput[0].files;
     if (!files.length) {
         alert('Please select at least one ZIP file.');
         return;
     }
 
-    // Close the modal
-    uploadZipModal.hide();
-
-    // Clear previous content
     images = [];
     videos = [];
-    mediaContainer.innerHTML = '';
-    videoContainer.innerHTML = '';
-    galleryThumbnails.innerHTML = '';
-    galleryBackground.style.backgroundImage = '';
-    galleryBackground.style.opacity = 0;
+    mediaContainer.empty();
+    videoContainer.empty();
+    galleryThumbnails.empty();
+    galleryBackground.css({ 'background-image': '', 'opacity': 0 });
     clearInterval(gallerySlideshowInterval);
 
     for (const file of files) {
@@ -197,6 +176,19 @@ processZipBtn.addEventListener('click', async function () {
                     }
                 }
             }
+
+            if (images.length > 0) {
+                $('#imagesCount').text(images.length);
+            }
+
+            if (videos.length > 0) {
+                $('#videosCount').text(videos.length);
+            }
+
+            if (images.length > 0 || videos.length > 0) {
+                var count = images.length + videos.length;
+                $('#fileCount').text(count);
+            }
         } catch (err) {
             console.error(`Error reading ZIP file: ${file.name}`, err);
             alert(`Error reading ZIP file: ${file.name}. Please ensure it's a valid ZIP archive.`);
@@ -205,97 +197,75 @@ processZipBtn.addEventListener('click', async function () {
 
     setupGallery();
 
-    // Show images tab by default
-    tabs.forEach(t => t.classList.remove('active'));
-    // Select the correct "Images" tab in the new navbar structure
-    document.querySelector('.tab[data-tab="imagesTab"]').classList.add('active');
-    mediaContainer.classList.add('active');
+    tabs.removeClass('active');
+    $('.tab[data-tab="imagesTab"]').addClass('active');
+    mediaContainer.addClass('active');
 });
 
-// Fullscreen viewer elements
-const fullscreenOverlay = document.getElementById('fullscreenOverlay');
-const fullscreenImage = document.getElementById('fullscreenImage');
-const fullscreenVideo = document.getElementById('fullscreenVideo');
-const fsNextBtn = document.getElementById('fsNextBtn');
-const fsPrevBtn = document.getElementById('fsPrevBtn');
-const fsCloseBtn = document.getElementById('fsCloseBtn');
+// Fullscreen handling
+const fullscreenOverlay = $('#fullscreenOverlay');
+const fullscreenImage = $('#fullscreenImage');
+const fullscreenVideo = $('#fullscreenVideo');
+const fsNextBtn = $('#fsNextBtn');
+const fsPrevBtn = $('#fsPrevBtn');
+const fsCloseBtn = $('#fsCloseBtn');
 
 let fullscreenIndex = 0;
-let fullscreenMediaType = 'image'; // 'image' or 'video'
+let fullscreenMediaType = 'image';
 
-// Open fullscreen for image or video
 function openFullscreen(index, type) {
     fullscreenIndex = index;
     fullscreenMediaType = type;
 
     if (type === 'image') {
-        fullscreenVideo.style.display = 'none';
-        fullscreenVideo.pause();
-        fullscreenImage.style.display = 'block';
-        fullscreenImage.src = images[index].url;
+        fullscreenVideo.hide().get(0).pause();
+        fullscreenImage.attr('src', images[index].url).show();
     } else if (type === 'video') {
-        fullscreenImage.style.display = 'none';
-        fullscreenVideo.style.display = 'block';
-        fullscreenVideo.src = videos[index].url;
-        fullscreenVideo.play();
+        fullscreenImage.hide();
+        fullscreenVideo.attr('src', videos[index].url).show().get(0).play();
     }
 
-    fullscreenOverlay.style.display = 'flex';
+    fullscreenOverlay.css('display', 'flex');
 }
 
-// Close fullscreen viewer
 function closeFullscreen() {
-    fullscreenOverlay.style.display = 'none';
-    fullscreenVideo.pause();
-    fullscreenVideo.src = '';
-    fullscreenImage.src = '';
+    fullscreenOverlay.hide();
+    fullscreenVideo.get(0).pause();
+    fullscreenVideo.attr('src', '');
+    fullscreenImage.attr('src', '');
 }
 
-// Show next media in fullscreen
 function showNextMedia() {
-    if (fullscreenMediaType === 'image') {
-        if (images.length === 0) return;
+    if (fullscreenMediaType === 'image' && images.length) {
         fullscreenIndex = (fullscreenIndex + 1) % images.length;
-        fullscreenImage.src = images[fullscreenIndex].url;
-    } else if (fullscreenMediaType === 'video') {
-        if (videos.length === 0) return;
+        fullscreenImage.attr('src', images[fullscreenIndex].url);
+    } else if (fullscreenMediaType === 'video' && videos.length) {
         fullscreenIndex = (fullscreenIndex + 1) % videos.length;
-        fullscreenVideo.src = videos[fullscreenIndex].url;
-        fullscreenVideo.play();
+        fullscreenVideo.attr('src', videos[fullscreenIndex].url);
+        fullscreenVideo.get(0).play();
     }
 }
 
-// Show previous media in fullscreen
 function showPrevMedia() {
-    if (fullscreenMediaType === 'image') {
-        if (images.length === 0) return;
+    if (fullscreenMediaType === 'image' && images.length) {
         fullscreenIndex = (fullscreenIndex - 1 + images.length) % images.length;
-        fullscreenImage.src = images[fullscreenIndex].url;
-    } else if (fullscreenMediaType === 'video') {
-        if (videos.length === 0) return;
+        fullscreenImage.attr('src', images[fullscreenIndex].url);
+    } else if (fullscreenMediaType === 'video' && videos.length) {
         fullscreenIndex = (fullscreenIndex - 1 + videos.length) % videos.length;
-        fullscreenVideo.src = videos[fullscreenIndex].url;
-        fullscreenVideo.play();
+        fullscreenVideo.attr('src', videos[fullscreenIndex].url);
+        fullscreenVideo.get(0).play();
     }
 }
 
-// Event listeners for fullscreen controls
-fsNextBtn.addEventListener('click', (e) => {
+fsNextBtn.on('click', function (e) {
     e.stopPropagation();
     showNextMedia();
 });
-
-fsPrevBtn.addEventListener('click', (e) => {
+fsPrevBtn.on('click', function (e) {
     e.stopPropagation();
     showPrevMedia();
 });
-
-fsCloseBtn.addEventListener('click', () => {
-    closeFullscreen();
-});
-
-fullscreenOverlay.addEventListener('click', (e) => {
-    if (e.target === fullscreenOverlay) {
-        closeFullscreen();
-    }
+fsCloseBtn.on('click', closeFullscreen);
+fullscreenOverlay.on('click', function (e) {
+    if (e.target === this) closeFullscreen();
 });

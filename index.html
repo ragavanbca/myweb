@@ -28,6 +28,10 @@
 
     <link href="css/custom.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
 
 <body>
@@ -102,7 +106,7 @@
             </div>
         </section>
 
-        <section class="about-section section-padding" id="section_2">
+        <section class="section-padding" id="section_2">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-12">
@@ -127,27 +131,31 @@
 
                     <div class="col-lg-5 col-12">
                         <div class="custom-block featured-custom-block">
-                            <h2 class="mt-2 mb-4">Opening Hours</h2>
+                            <h2 class="mt-2 mb-4">No of Files</h2>
 
                             <div class="d-flex">
                                 <i class="featured-icon bi-clock me-3"></i>
 
                                 <div>
                                     <p class="mb-2">
-                                        Mon - Friday ~
+                                        <strong class="d-inline" id="fileCount">0</strong> files found in the ZIP
+                                    </p>
+
+                                    <p class="mb-2">
+                                        Images ~
                                         <strong class="d-inline">
-                                            8:00 AM - 6:00 PM
+                                            <span id="imagesCount">0</span>
                                         </strong>
                                     </p>
 
                                     <p class="mb-2">
-                                        Saturday ~
+                                        Videos ~
                                         <strong class="d-inline">
-                                            10:00 AM - 10:00 PM
+                                            <span id="videosCount">0</span>
                                         </strong>
                                     </p>
 
-                                    <p>Sunday ~ Closed</p>
+                                    <p>All was Welcome !</p>
                                 </div>
                             </div>
                         </div>
