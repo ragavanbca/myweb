@@ -3,481 +3,217 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Gallery Slideshow with Fade & Multi-Zip</title>
-    <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        body {
-            display: flex;
-            flex-direction: column;
-            padding: 10px 20px;
-            height: 100vh;
-            overflow: hidden;
-        }
+    <meta name="description" content="">
+    <meta name="author" content="Tooplate">
 
-        h2 {
-            margin-bottom: 5px;
-        }
+    <title>Multi-Zip Reader</title>
 
-        #tabsHeader {
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 2000;
-            display: flex;
-            gap: 15px;
-            padding: 10px 0;
-            border-bottom: 2px solid #1D7FBF;
-            user-select: none;
-        }
+    <!-- CSS FILES -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
-        .tab {
-            cursor: pointer;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: #1D7FBF;
-            border: 2px solid transparent;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        .tab.active {
-            background-color: #1D7FBF;
-            color: white;
-            border-color: #1D7FBF;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;300;400;600;700&display=swap"
+        rel="stylesheet">
 
-        #mediaContainer,
-        #videoContainer,
-        #galleryContainer {
-            flex: 1 1 auto;
-            overflow-y: auto;
-            margin-top: 10px;
-            display: none;
-        }
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
-        #mediaContainer.active,
-        #videoContainer.active,
-        #galleryContainer.active {
-            display: flex;
-        }
+    <link href="css/bootstrap-icons.css" rel="stylesheet">
 
-        #mediaContainer,
-        #videoContainer {
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: flex-start;
-            width: 100%;
-        }
+    <link href="css/owl.carousel.min.css" rel="stylesheet">
 
-        .media-wrapper {
-            text-align: center;
-        }
+    <link href="css/tooplate-moso-interior.css" rel="stylesheet">
 
-        #galleryContainer {
-            flex-direction: column;
-        }
+    <link href="css/custom.css" rel="stylesheet">
 
-        #galleryBackground {
-            flex: 1;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: contain;
-            border: 1px solid #ddd;
-            margin-bottom: 10px;
-            height: 60vh;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-        #galleryThumbnails {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-
-        #galleryThumbnails img {
-            height: 80px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            border-radius: 6px;
-            transition: border-color 0.3s ease, transform 0.3s ease;
-        }
-
-        #galleryThumbnails img:hover {
-            transform: scale(1.2);
-            border-color: #1D7FBF;
-            z-index: 10;
-        }
-
-        #galleryThumbnails img.selected {
-            border-color: #1D7FBF;
-        }
-
-        @media screen and (max-width: 600px) {
-            #tabsHeader {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .tab {
-                width: 100%;
-                text-align: center;
-            }
-
-            #galleryBackground {
-                height: 50vh;
-            }
-
-            #galleryThumbnails img {
-                height: 60px;
-            }
-
-            #mediaContainer,
-            #videoContainer {
-                flex-direction: row;
-                align-items: center;
-            }
-
-            img {
-                width: 200px !important;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
-    <h2>Select Zip Files</h2>
-    <input type="file" id="zipInput" accept=".zip" multiple />
+    <nav class="navbar navbar-expand-lg bg-light fixed-top shadow-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Zip <span class="tooplate-red">File</span><span
+                    class="tooplate-green">Reader</span></a>
 
-    <div id="tabsHeader">
-        <div class="tab active" data-tab="imagesTab">Images</div>
-        <div class="tab" data-tab="videosTab">Videos</div>
-        <div class="tab" data-tab="galleryTab">Gallery</div>
-    </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-    <div id="mediaContainer" class="active"></div>
-    <div id="videoContainer"></div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="tabsHeader">
+                    <li class="nav-item">
+                        <a class="nav-link tab active" href="#" data-tab="homeTap">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab" href="#" data-tab="imagesTab">Images</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab" href="#" data-tab="videosTab">Videos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab" href="#" data-tab="galleryTab">Gallery</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div id="galleryContainer">
-        <div id="galleryBackground"></div>
-        <div id="galleryThumbnails"></div>
-    </div>
+    <main>
+        <section class="hero-section hero-slide d-flex justify-content-center align-items-center" id="section_1">
+            <div class="container">
+                <div class="row">
 
-    <!-- Fullscreen media viewer -->
-    <div id="fullscreenOverlay"
-        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center; flex-direction: column;">
-        <button id="fsPrevBtn"
-            style="position:absolute; top:50%; left:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer; user-select:none;">&#10094;</button>
+                    <div class="col-lg-8 col-12 text-center mx-auto">
+                        <div class="hero-section-text">
+                            <small class="section-small-title">Welcome to Zip File Reader <i
+                                    class="hero-icon bi-zip"></i></small>
 
-        <img id="fullscreenImage" src="" alt="Fullscreen"
-            style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow: 0 0 20px #000; display:none;">
+                            <h2 class="hero-title text-white mt-2 mb-4">Select one or more ZIP files containing images
+                                and/or videos.
+                            </h2>
 
-        <video id="fullscreenVideo" controls autoplay muted loop
-            style="max-width:90vw; max-height:90vh; border-radius:10px; box-shadow: 0 0 20px #000; display:none;">
-            Sorry, your browser doesn't support embedded videos.
-        </video>
+                            <form class="custom-form hero-form" action="#" method="get" role="form">
+                                <div class="row">
+                                    <div class="col-lg-10 col-md-6 col-12">
+                                        <div class="input-group align-items-center">
+                                            <input type="file" id="zipInput" accept=".zip" multiple
+                                                class="form-control" />
+                                        </div>
+                                    </div>
 
-        <button id="fsNextBtn"
-            style="position:absolute; top:50%; right:20px; font-size:2rem; background:none; border:none; color:white; cursor:pointer; user-select:none;">&#10095;</button>
-        <button id="fsCloseBtn"
-            style="position:absolute; top:20px; right:30px; font-size:2rem; background:none; border:none; color:white; cursor:pointer;">&times;</button>
-    </div>
+                                    <div class="col-lg-2 col-md-6 col-12">
+                                        <button type="button" class="btn btn-primary"
+                                            style="padding: 7%;width: 100%;font-size: 22px;"
+                                            id="processZipBtn">Read...</button>
+                                    </div>
+                                </div>
+                            </form>
 
+                            <div class="hero-btn d-flex justify-content-center align-items-center">
+                                <a class="bi-arrow-down hero-btn-link smoothscroll" href="#section_2"></a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section section-padding" id="section_2">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <div class="main-content">
+                            <div id="mediaContainer" class="active"></div>
+                            <div id="videoContainer"></div>
+
+                            <div id="galleryContainer">
+                                <div id="galleryBackground"></div>
+                                <div id="galleryThumbnails"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-section section-padding">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-5 col-12">
+                        <div class="custom-block featured-custom-block">
+                            <h2 class="mt-2 mb-4">Opening Hours</h2>
+
+                            <div class="d-flex">
+                                <i class="featured-icon bi-clock me-3"></i>
+
+                                <div>
+                                    <p class="mb-2">
+                                        Mon - Friday ~
+                                        <strong class="d-inline">
+                                            8:00 AM - 6:00 PM
+                                        </strong>
+                                    </p>
+
+                                    <p class="mb-2">
+                                        Saturday ~
+                                        <strong class="d-inline">
+                                            10:00 AM - 10:00 PM
+                                        </strong>
+                                    </p>
+
+                                    <p>Sunday ~ Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <div id="fullscreenOverlay">
+            <button id="fsPrevBtn" style="position:absolute; top:50%; left:20px;">&#10094;</button>
+
+            <img id="fullscreenImage" src="" alt="Fullscreen" style="display:none;">
+
+            <video id="fullscreenVideo" controls autoplay muted loop style="display:none;">
+                Sorry, your browser doesn't support embedded videos.
+            </video>
+
+            <button id="fsNextBtn" style="position:absolute; top:50%; right:20px;">&#10095;</button>
+            <button id="fsCloseBtn" style="position:absolute; top:20px; right:30px;">&times;</button>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container pb-4">
+            <div class="row text-center">
+                <div class="col-12 d-flex align-items-center justify-content-center mt-4">
+                    <p class="copyright-text mb-0 me-4">Copyright © Zip file reader 2048</p>
+
+                    <ul class="social-icon">
+                        <li class="social-icon-item">
+                            <a href="#" class="social-icon-link social-icon-twitter bi-twitter"></a>
+                        </li>
+
+                        <li class="social-icon-item">
+                            <a href="#" class="social-icon-link social-icon-facebook bi-facebook"></a>
+                        </li>
+
+                        <li class="social-icon-item">
+                            <a href="#" class="social-icon-link social-icon-instagram bi-instagram"></a>
+                        </li>
+
+                        <li class="social-icon-item">
+                            <a href="#" class="social-icon-link social-icon-pinterest bi-pinterest"></a>
+                        </li>
+
+                        <li class="social-icon-item">
+                            <a href="#" class="social-icon-link social-icon-whatsapp bi-whatsapp"></a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT FILES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script>
-        const mediaContainer = document.getElementById('mediaContainer');
-        const videoContainer = document.getElementById('videoContainer');
-        const galleryContainer = document.getElementById('galleryContainer');
-        const galleryBackground = document.getElementById('galleryBackground');
-        const galleryThumbnails = document.getElementById('galleryThumbnails');
-        const tabs = document.querySelectorAll('#tabsHeader .tab');
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/click-scroll.js"></script>
+    <script src="js/jquery.backstretch.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/custom.js"></script>
+    <script src="js/index.js"></script>
 
-        let images = [], videos = [];
-        let gallerySlideshowIndex = 0;
-        let gallerySlideshowInterval = null;
-        let isAnimating = false;
-
-        // Add image thumbnail in Images tab
-        function addImageToImagesTab(media) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'media-wrapper';
-
-            const img = document.createElement('img');
-            img.src = media.url;
-            img.style.width = '250px';
-            img.title = media.filename;
-
-            img.onclick = () => {
-                const index = images.findIndex(m => m.url === media.url);
-                if (index !== -1) openFullscreen(index, 'image');
-            };
-
-            wrapper.appendChild(img);
-            mediaContainer.appendChild(wrapper);
-        }
-
-        // Add video thumbnail in Videos tab
-        function addVideoToVideosTab(media) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'media-wrapper';
-
-            const video = document.createElement('video');
-            video.src = media.url;
-            video.controls = true;
-            video.autoplay = true; // no autoplay in thumbnail
-            video.muted = true;
-            video.loop = true;
-            video.style.width = '250px';
-
-            video.onclick = () => {
-                const index = videos.findIndex(m => m.url === media.url);
-                if (index !== -1) openFullscreen(index, 'video');
-            };
-
-            wrapper.appendChild(video);
-            videoContainer.appendChild(wrapper);
-        }
-
-        // Setup gallery thumbnails and background
-        function setupGallery() {
-            if (images.length === 0) return;
-
-            galleryThumbnails.innerHTML = '';
-
-            images.forEach((media, idx) => {
-                const thumb = document.createElement('img');
-                thumb.src = media.url;
-                thumb.title = media.filename;
-                if (idx === 0) thumb.classList.add('selected');
-                thumb.onclick = () => {
-                    clearInterval(gallerySlideshowInterval);
-                    gallerySlideshowIndex = idx;
-                    setGalleryBackground(media.url);
-                    updateThumbnailSelection(idx);
-                };
-                galleryThumbnails.appendChild(thumb);
-            });
-
-            // Set initial gallery background
-            setGalleryBackground(images[0].url);
-            updateThumbnailSelection(0);
-        }
-
-        // Update selected thumbnail styling
-        function updateThumbnailSelection(index) {
-            galleryThumbnails.querySelectorAll('img').forEach((img, i) => {
-                img.classList.toggle('selected', i === index);
-            });
-        }
-
-        // Fade transition for gallery background
-        function setGalleryBackground(url) {
-            if (isAnimating) return;
-            isAnimating = true;
-
-            galleryBackground.style.opacity = 0;
-            setTimeout(() => {
-                galleryBackground.style.backgroundImage = `url('${url}')`;
-                galleryBackground.style.opacity = 1;
-                setTimeout(() => {
-                    isAnimating = false;
-                }, 1000);
-            }, 500);
-        }
-
-        // Start the slideshow in gallery tab
-        function startGallerySlideshow() {
-            if (images.length === 0) return;
-
-            clearInterval(gallerySlideshowInterval);
-            gallerySlideshowIndex = 0;
-            setGalleryBackground(images[gallerySlideshowIndex].url);
-            updateThumbnailSelection(gallerySlideshowIndex);
-
-            gallerySlideshowInterval = setInterval(() => {
-                gallerySlideshowIndex = (gallerySlideshowIndex + 1) % images.length;
-                setGalleryBackground(images[gallerySlideshowIndex].url);
-                updateThumbnailSelection(gallerySlideshowIndex);
-            }, 3000);
-        }
-
-        // Tabs click handling
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                const target = tab.getAttribute('data-tab');
-
-                mediaContainer.classList.remove('active');
-                videoContainer.classList.remove('active');
-                galleryContainer.classList.remove('active');
-                clearInterval(gallerySlideshowInterval);
-
-                if (target === 'imagesTab') {
-                    mediaContainer.classList.add('active');
-                } else if (target === 'videosTab') {
-                    videoContainer.classList.add('active');
-                } else if (target === 'galleryTab') {
-                    galleryContainer.classList.add('active');
-                    startGallerySlideshow();
-                }
-            });
-        });
-
-        // Handle ZIP input and extract media files
-        document.getElementById('zipInput').addEventListener('change', async function (event) {
-            const files = event.target.files;
-            if (!files.length) return;
-
-            // Clear previous content
-            images = [];
-            videos = [];
-            mediaContainer.innerHTML = '';
-            videoContainer.innerHTML = '';
-            galleryThumbnails.innerHTML = '';
-            galleryBackground.style.backgroundImage = '';
-            galleryBackground.style.opacity = 0;
-            clearInterval(gallerySlideshowInterval);
-
-            for (const file of files) {
-                const zip = new JSZip();
-                try {
-                    const contents = await zip.loadAsync(file);
-                    for (const filename of Object.keys(contents.files)) {
-                        const fileData = contents.files[filename];
-                        if (fileData.dir) continue;
-
-                        const ext = filename.split('.').pop().toLowerCase();
-                        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
-                        const isVideo = ['mp4', 'webm', 'ogg'].includes(ext);
-
-                        if (isImage || isVideo) {
-                            const blob = await fileData.async('blob');
-                            const url = URL.createObjectURL(blob);
-                            const media = { type: isImage ? 'image' : 'video', url, filename };
-
-                            if (isImage) {
-                                images.push(media);
-                                addImageToImagesTab(media);
-                            } else {
-                                videos.push(media);
-                                addVideoToVideosTab(media);
-                            }
-                        }
-                    }
-                } catch (err) {
-                    console.error(`Error reading ZIP file: ${file.name}`, err);
-                }
-            }
-
-            setupGallery();
-
-            // Show images tab by default
-            tabs.forEach(t => t.classList.remove('active'));
-            document.querySelector('.tab[data-tab="imagesTab"]').classList.add('active');
-            mediaContainer.classList.add('active');
-        });
-
-        // Fullscreen viewer elements
-        const fullscreenOverlay = document.getElementById('fullscreenOverlay');
-        const fullscreenImage = document.getElementById('fullscreenImage');
-        const fullscreenVideo = document.getElementById('fullscreenVideo');
-        const fsNextBtn = document.getElementById('fsNextBtn');
-        const fsPrevBtn = document.getElementById('fsPrevBtn');
-        const fsCloseBtn = document.getElementById('fsCloseBtn');
-
-        let fullscreenIndex = 0;
-        let fullscreenMediaType = 'image'; // 'image' or 'video'
-
-        // Open fullscreen for image or video
-        function openFullscreen(index, type) {
-            fullscreenIndex = index;
-            fullscreenMediaType = type;
-
-            if (type === 'image') {
-                fullscreenVideo.style.display = 'none';
-                fullscreenVideo.pause();
-                fullscreenImage.style.display = 'block';
-                fullscreenImage.src = images[index].url;
-            } else if (type === 'video') {
-                fullscreenImage.style.display = 'none';
-                fullscreenVideo.style.display = 'block';
-                fullscreenVideo.src = videos[index].url;
-                fullscreenVideo.play();
-            }
-
-            fullscreenOverlay.style.display = 'flex';
-        }
-
-        // Close fullscreen viewer
-        function closeFullscreen() {
-            fullscreenOverlay.style.display = 'none';
-            fullscreenVideo.pause();
-            fullscreenVideo.src = '';
-            fullscreenImage.src = '';
-        }
-
-        // Show next media in fullscreen
-        function showNextMedia() {
-            if (fullscreenMediaType === 'image') {
-                if (images.length === 0) return;
-                fullscreenIndex = (fullscreenIndex + 1) % images.length;
-                fullscreenImage.src = images[fullscreenIndex].url;
-            } else if (fullscreenMediaType === 'video') {
-                if (videos.length === 0) return;
-                fullscreenIndex = (fullscreenIndex + 1) % videos.length;
-                fullscreenVideo.src = videos[fullscreenIndex].url;
-                fullscreenVideo.play();
-            }
-        }
-
-        // Show previous media in fullscreen
-        function showPrevMedia() {
-            if (fullscreenMediaType === 'image') {
-                if (images.length === 0) return;
-                fullscreenIndex = (fullscreenIndex - 1 + images.length) % images.length;
-                fullscreenImage.src = images[fullscreenIndex].url;
-            } else if (fullscreenMediaType === 'video') {
-                if (videos.length === 0) return;
-                fullscreenIndex = (fullscreenIndex - 1 + videos.length) % videos.length;
-                fullscreenVideo.src = videos[fullscreenIndex].url;
-                fullscreenVideo.play();
-            }
-        }
-
-        // Event listeners for fullscreen controls
-        fsNextBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showNextMedia();
-        });
-
-        fsPrevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showPrevMedia();
-        });
-
-        fsCloseBtn.addEventListener('click', () => {
-            closeFullscreen();
-        });
-
-        fullscreenOverlay.addEventListener('click', (e) => {
-            if (e.target === fullscreenOverlay) {
-                closeFullscreen();
-            }
-        });
-
-    </script>
 </body>
 
 </html>

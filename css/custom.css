@@ -1,0 +1,120 @@
+#mediaContainer,
+#videoContainer,
+#galleryContainer {
+    display: none;
+    margin-top: 10px;
+}
+
+#mediaContainer.active,
+#videoContainer.active,
+#galleryContainer.active {
+    display: flex;
+}
+
+#mediaContainer,
+#videoContainer {
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.media-wrapper {
+    text-align: center;
+}
+
+#galleryContainer {
+    flex-direction: column;
+}
+
+#galleryBackground {
+    flex: 1;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    height: 60vh;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+#galleryThumbnails {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+#galleryThumbnails img {
+    height: 80px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+#galleryThumbnails img:hover {
+    transform: scale(1.1);
+    border-color: #1D7FBF;
+    z-index: 10;
+}
+
+#galleryThumbnails img.selected {
+    border-color: #1D7FBF;
+}
+
+/* Fullscreen Overlay Styles */
+#fullscreenOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 5000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#fullscreenOverlay button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 2rem;
+    user-select: none;
+}
+
+#fullscreenOverlay img,
+#fullscreenOverlay video {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #000;
+}
+
+@media screen and (max-width: 600px) {
+    #galleryBackground {
+        height: 50vh;
+    }
+
+    #galleryThumbnails img {
+        height: 60px;
+    }
+
+    #mediaContainer,
+    #videoContainer {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .media-wrapper img,
+    .media-wrapper video {
+        width: 150px !important;
+        /* Adjusted for smaller screens */
+        height: auto;
+    }
+}
