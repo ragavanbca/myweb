@@ -113,7 +113,7 @@
 
     .media-wrapper img,
     .media-wrapper video {
-        width: 150px !important;
+        width: 75px !important;
         /* Adjusted for smaller screens */
         height: auto;
     }

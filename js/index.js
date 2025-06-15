@@ -15,7 +15,7 @@ let isAnimating = false;
 function addImageToImagesTab(media) {
     const wrapper = $('<div>').addClass('media-wrapper');
     // Determine width based on screen size
-    const videoWidth = window.innerWidth <= 600 ? '150px' : '235px';
+    const videoWidth = window.innerWidth <= 600 ? '75px' : '235px';
 
     const img = $('<img>')
         .attr('src', media.url)
@@ -34,7 +34,7 @@ function addImageToImagesTab(media) {
 function addVideoToVideosTab(media) {
     const wrapper = $('<div>').addClass('media-wrapper');
     // Determine width based on screen size
-    const videoWidth = window.innerWidth <= 600 ? '150px' : '235px';
+    const videoWidth = window.innerWidth <= 600 ? '75px' : '235px';
 
     const video = $('<video>')
         .attr({
