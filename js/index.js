@@ -14,10 +14,13 @@ let isAnimating = false;
 
 function addImageToImagesTab(media) {
     const wrapper = $('<div>').addClass('media-wrapper');
+    // Determine width based on screen size
+    const videoWidth = window.innerWidth <= 600 ? '150px' : '235px';
+
     const img = $('<img>')
         .attr('src', media.url)
         .addClass('img-fluid rounded')
-        .css('width', '235px')
+        .css('width', videoWidth)
         .attr('title', media.filename)
         .on('click', function () {
             const index = images.findIndex(m => m.url === media.url);
@@ -30,6 +33,9 @@ function addImageToImagesTab(media) {
 
 function addVideoToVideosTab(media) {
     const wrapper = $('<div>').addClass('media-wrapper');
+    // Determine width based on screen size
+    const videoWidth = window.innerWidth <= 600 ? '150px' : '235px';
+
     const video = $('<video>')
         .attr({
             src: media.url,
@@ -39,7 +45,7 @@ function addVideoToVideosTab(media) {
             loop: false
         })
         .addClass('img-fluid rounded')
-        .css('width', '235px')
+        .css('width', videoWidth)
         .on('click', function () {
             const index = videos.findIndex(m => m.url === media.url);
             if (index !== -1) openFullscreen(index, 'video');
